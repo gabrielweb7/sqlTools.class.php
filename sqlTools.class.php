@@ -24,41 +24,16 @@
 		/**
 		*	Construct da Classe
 		*/
-		public function __construct($dataArray) { 
+		public function __construct($dataArray = false) { 
 			
-			/* Verificar se data é array */
-			if(!is_array($dataArray)) { 
-				$this->setError("[sqlTools]::[_sendData]: A variável recebida na coluna '\$dataArray' não é do tipo Array! ");
-				return false; 
-			}
-			
-			/* Set Post Data */
-			$this->_setPostData($dataArray);
-			
-		}
-		
-		/**
-		*	Função criada para gerar SQL DINAMICO
-		*/
-		public function generateSql() { 
-			
-			if($this->getMethod() == "select") { 
-				/* Gerando Sql para Select */
-				$this->generateSqlSelect();
-			} 
-			else if($this->getMethod() == "insert") {
-				/* Gerando Sql para Select */
-				$this->generateSqlInsert();
-			}
-			else if($this->getMethod() == "update") {
-				/* Gerando Sql para Select */
-				$this->generateSqlUpdate();
-			}
-			else if($this->getMethod() == "delete") {
-				/* Gerando Sql para Select */
-				$this->generateSqlDelete();
-			}
+			/* Se data Array Existir */
+			if($dataArray) { 
 
+				/* Set Post Data */
+				$this->_setPostData($dataArray);
+			
+			}
+			
 		}
 
 		/* Gerar SQL para Select */
@@ -97,6 +72,7 @@
 		
 		/* Gerar SQL para Update */
 		protected function generateSqlUpdate() { 
+		
 			/* Criando Sql */
 			$this->_outSQL = "update {$this->getTable()} set "; 
 			/* Foreach */
@@ -142,11 +118,50 @@
 			}
 		}
 		
+			
+		/**
+		*	Função criada para gerar SQL DINAMICO
+		*/
+		public function generateSql() { 
+			
+			if($this->getMethod() == "select") { 
+				/* Gerando Sql para Select */
+				$this->generateSqlSelect();
+			} 
+			else if($this->getMethod() == "insert") {
+				/* Gerando Sql para Select */
+				$this->generateSqlInsert();
+			}
+			else if($this->getMethod() == "update") {
+				/* Gerando Sql para Select */
+				$this->generateSqlUpdate();
+			}
+			else if($this->getMethod() == "delete") {
+				/* Gerando Sql para Select */
+				$this->generateSqlDelete();
+			}
+
+		}
+		
 		/**
 		*	Função criada para verificar se tudo está ok antes de gerar o SQL
 		*/
 		public function checkValidOptions() {
 			
+			
+			/* Verificar se data é array */
+			if(!is_array($this->_getPostData())) { 
+				$this->setError("[sqlTools]::[__construct]: A variável recebida na coluna '\$dataArray' não é do tipo Array! ");
+				return false; 
+			}
+
+			/* Verifica quantidade de posicoes */
+			$_rad = array_keys($this->_getPostData());
+			if(!is_string($_rad[0])) { 
+				$this->setError("[sqlTools]::[__construct]: A variável recebida na coluna '\$dataArray' tem que ter todos os indices do tipo 'String' ! ");
+				return false; 
+			}
+
 			/* Verifica se method existe */
 			if(!$this->getMethod()) {
 				$this->setError("[sqlTools]::[checkValidOptions]: A variável '\$method' não existe ! ");
@@ -163,6 +178,15 @@
 			if(!$this->getTable()) { 
 				$this->setError("[sqlTools]::[checkValidOptions]: A variável '\$table' não existe! ");
 				return false;
+			}
+						
+			/* Se caso method for update verificar se data foi recebida */
+			if($this->getMethod() == "update" or $this->getMethod() == "insert") { 
+				/* Se getPostData não existe.. retornar erro ! */
+				if(!$this->_getPostData()) {
+					$this->setError("[sqlTools]::[checkValidOptions]: A variável '\$__postData' não foi recebida corretamente! ");
+					return false;
+				}
 			}
 			
 			

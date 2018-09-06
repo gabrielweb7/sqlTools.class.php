@@ -20,7 +20,7 @@
 	$sqlTools = new sqlTools($data);
 	
 	/* Variaveis obrigatorias */
-	$sqlTools->setMethod("update");
+	$sqlTools->setMethod("insert");
 	$sqlTools->setTable("tabela");
 	
 	/* Variaveis opcionais */
