@@ -4,6 +4,7 @@
 	*	Author: Gabriel Azuaga Barbosa <gabrielbarbosaweb7@gmail.com>
 	*	Github: https://github.com/gabrielweb7
 	*	Site pessoal: http://gabrieldaluz.com.br
+	*	Version 1.1
 	*/
 	class sqlTools {
 	
@@ -147,30 +148,41 @@
 		*	Função criada para verificar se tudo está ok antes de gerar o SQL
 		*/
 		public function checkValidOptions() {
-			
-			
-			/* Verificar se data é array */
-			if(!is_array($this->_getPostData())) { 
-				$this->setError("[sqlTools]::[__construct]: A variável recebida na coluna '\$dataArray' não é do tipo Array! ");
-				return false; 
-			}
 
-			/* Verifica quantidade de posicoes */
-			$_rad = array_keys($this->_getPostData());
-			if(!is_string($_rad[0])) { 
-				$this->setError("[sqlTools]::[__construct]: A variável recebida na coluna '\$dataArray' tem que ter todos os indices do tipo 'String' ! ");
-				return false; 
-			}
+
+            /* Verifica se method é valido */
+            if(!in_array($this->getMethod(), $this->validMethods)) {
+                $this->setError("[sqlTools]::[checkValidOptions]: Somente os parametros 'select', 'insert', 'update', 'delete' é aceito na função ! ");
+                return false;
+            }
+
+			/* Verificar se data é array .. somente se for update ou insert */
+            if($this->getMethod() == "insert" or $this->getMethod() == "update") {
+
+                /* Verifica se postData está com valor FALSE */
+                if(!$this->_getPostData()) {
+                    $this->setError("[sqlTools]::[checkValidOptions]: No caso de insert e update é necessario especificar uma array na criação da classe Ex: '\$data['colunaNome-x']' ! ");
+                    return false;
+                }
+
+                /* Verifica se postData é do tipo Array */
+                if(!is_array($this->_getPostData())) {
+                    $this->setError("[sqlTools]::[checkValidOptions]: A variável recebida na coluna '\$dataArray' não é do tipo Array! ");
+                    return false;
+                }
+
+                /* Verifica quantidade de posicoes */
+                $_rad = array_keys($this->_getPostData());
+                if(!is_string($_rad[0])) {
+                    $this->setError("[sqlTools]::[checkValidOptions]: A variável recebida na coluna '\$dataArray' tem que ter todos os indices do tipo 'String' ! ");
+                    return false;
+                }
+
+            }
 
 			/* Verifica se method existe */
 			if(!$this->getMethod()) {
 				$this->setError("[sqlTools]::[checkValidOptions]: A variável '\$method' não existe ! ");
-				return false;
-			}
-			
-			/* Verifica se method é valido */
-			if(!in_array($this->getMethod(), $this->validMethods)) { 
-				$this->setError("[sqlTools]::[checkValidOptions]: Somente os parametros 'select', 'insert', 'update', 'delete' é aceito na função ! ");
 				return false;
 			}
 			
